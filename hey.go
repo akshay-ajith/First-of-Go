@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"text/template"
+	"time"
 )
 
 type Film struct {
@@ -29,13 +30,15 @@ func main() {
 
 	}
 	h2 := func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(1 * time.Second)
+
 		title := r.PostFormValue("title")
 		director := r.PostFormValue("Director")
 		fmt.Println(title)
 		fmt.Println(director)
-		htmlstr := fmt.Sprintf("<li class = 'list-group-item bg-primary text-white'> %s - %s</li>", title, director)
-		tmpl, _ := template.New("t").Parse(htmlstr)
-		tmpl.Execute(w, nil)
+
+		tmpl := template.Must(template.ParseFiles("index.html"))
+		tmpl.ExecuteTemplate(w, "film-list-element", Film{Title: title, Director: director})
 	}
 
 	http.HandleFunc("/", h1)
